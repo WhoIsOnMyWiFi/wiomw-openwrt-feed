@@ -107,19 +107,19 @@ function create_login_form(badcreds) {
 	'    </td>' +
 	'    <td>' +
 	'     <form id="wiomw_login">' +
-	'      <fieldset class="cbi-section-node">' +
+	'      <fieldset class="cbi-section-node" style="min-width:300px;">' +
 	'       <legend><%:Existing Members%></legend>' +
 	errorMessage +
 	'       <div class="cbi-value">' +
 	'        <label class="cbi-value-title" for="wiomw_username"><%:Username%></label>' +
 	'        <div class="cbi-value-field">' +
-	'         <input style="width:300px;" type="text" class="cbi-input-text" name="wiomw_username" id="wiomw_username" value="' + username + '" />' +
+	'         <input type="text" class="cbi-input-text" name="wiomw_username" id="wiomw_username" value="' + username + '" />' +
 	'        </div>' +
 	'       </div>' +
 	'       <div class="cbi-value">' +
 	'        <label class="cbi-value-title" for="wiomw_password"><%:Password%></label>' +
 	'        <div class="cbi-value-field">' +
-	'         <input style="width:300px;" type="password" class="cbi-input-text" name="wiomw_password" id="wiomw_password" value="" />' +
+	'         <input type="password" class="cbi-input-text" name="wiomw_password" id="wiomw_password" value="" />' +
 	'        </div>' +
 	'       </div>' +
 	'       <br />' +
@@ -130,6 +130,7 @@ function create_login_form(badcreds) {
 	'       </div>' +
 	'      </fieldset>' +
 	'     </form>' +
+	'     <br />' +
 	'     <h3><%:Not a member yet? %><a href="https://www.whoisonmywifi.net/signup"><%:Sign up today!%></a></h3>' +
 	'    </td>' +
 	'   </tr>' +
@@ -177,18 +178,18 @@ function create_cred_display() {
 	'     <img src="https://www.whoisonmywifi.net/images/website_logo.png" alt="<%:Who Is On My WiFi%>" />' +
 	'    </td>' +
 	'    <td>' +
-	'      <fieldset class="cbi-section-node">' +
+	'      <fieldset class="cbi-section-node" style="min-width:300px;">' +
 	'       <legend><%:Account Information%></legend>' +
 	'       <div class="cbi-value">' +
 	'        <label class="cbi-value-title" for="wiomw_username"><%:Username%></label>' +
 	'        <div class="cbi-value-field">' +
-	'         <input style="width:300px;" type="text" class="cbi-input-text" id="wiomw_username" disabled="1" value="<%=username%>" />' +
+	'         <input type="text" class="cbi-input-text" id="wiomw_username" disabled="1" value="<%=username%>" />' +
 	'        </div>' +
 	'       </div>' +
 	'       <div class="cbi-value">' +
 	'        <label class="cbi-value-title" for="wiomw_agentkey"><%:Agent Key%></label>' +
 	'        <div class="cbi-value-field">' +
-	'         <input style="width:300px;" type="text" class="cbi-input-text" id="wiomw_agentkey" disabled="1" value="<%=agentkey%>" />' +
+	'         <input type="text" class="cbi-input-text" id="wiomw_agentkey" disabled="1" value="<%=agentkey%>" />' +
 	'        </div>' +
 	'       </div>' +
 	'       <div style="float: right;">' +
