@@ -1,0 +1,23 @@
+#!/bin/sh /etc/rc.common
+
+START=90
+APP=wiomw-agent
+PID_FILE=/var/run/$APP.pid
+
+start() {
+	echo -n "$APP is starting... "
+	start-stop-daemon -q -b -m -p $PID_FILE -x $APP -S
+	echo OK
+}
+
+stop()
+{
+	echo -n "$APP is stopping... "
+	start-stop-daemon -q -p $PID_FILE -s SIGKILL -x $APP -K
+	if [ -e $PID_FILE ]
+	then
+		rm $PID_FILE
+	fi
+	echo OK
+}
+

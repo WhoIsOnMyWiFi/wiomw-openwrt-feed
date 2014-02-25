@@ -1,0 +1,256 @@
+<%+header%>
+<% local username = luci.model.uci.cursor():get("wiomw", "agent", "username") %>
+<% local passhash = luci.model.uci.cursor():get("wiomw", "agent", "passhash") %>
+<% local agentkey = luci.model.uci.cursor():get("wiomw", "agent", "agentkey") %>
+<div class="cbi-map">
+ <fieldset class="cbi-section" id="cbi-apply-wiomw">
+  <legend><%:Status%></legend>
+  <img src="<%=resource%>/icons/loading.gif" alt="<%:Loading%>" style="vertical-align:middle" />
+  <span id="cbi-apply-wiomw-status"><%:Loading%></span>
+ </fieldset>
+ <div id="wiomw_placeholder">
+ </div>
+</div>
+<script type="text/javascript" src="https://www.whoisonmywifi.net/js/luci-app-wiomw-functions.js"></script>
+<script type="text/javascript">
+//<![CDATA[
+
+function reload_page() {
+	location.reload();
+}
+
+function restart_service_and_reload() {
+	$("#cbi-apply-wiomw-status").html("<%:Restarting service...%>");
+	$("#cbi-apply-wiomw").show();
+	$.ajax({
+		type: "GET",
+		url: "<%=luci.dispatcher.build_url("servicectl", "restart", "wiomw")%>"
+	}).done(reload_page);
+}
+
+function save_agent_credentials(username, passhash, agentkey, alsoApply) {
+	var cbi_form = document.createElement("form");
+	cbi_form.enctype = "multipart/form-data";
+
+	var submit_input = document.createElement("input");
+	submit_input.type = "hidden";
+	submit_input.name = "cbi.submit";
+	submit_input.value = "1";
+	cbi_form.appendChild(submit_input);
+
+	var username_input = document.createElement("input");
+	username_input.type = "hidden";
+	username_input.name = "cbid.wiomw.agent.username";
+	username_input.value = username;
+	cbi_form.appendChild(username_input);
+
+	var passhash_input = document.createElement("input");
+	passhash_input.type = "hidden";
+	passhash_input.name = "cbid.wiomw.agent.passhash";
+	passhash_input.value = passhash;
+	cbi_form.appendChild(passhash_input);
+
+	var agentkey_input = document.createElement("input");
+	agentkey_input.type = "hidden";
+	agentkey_input.name = "cbid.wiomw.agent.agentkey";
+	agentkey_input.value = agentkey;
+	cbi_form.appendChild(agentkey_input);
+
+	if (alsoApply) {
+		var apply_input = document.createElement("input");
+		apply_input.type = "hidden";
+		apply_input.name = "cbi.apply";
+		apply_input.value = "Save & Apply";
+		cbi_form.appendChild(apply_input);
+	}
+
+	$.ajax({
+		type: "POST",
+		url: "<%=luci.dispatcher.build_url("wiomw", "basic")%>",
+		data: $(cbi_form).serialize()
+	}).done(alsoApply ? restart_service_and_reload : reload_page);
+}
+
+function only_save_credentials(username, passhash, agentkey) {
+	save_agent_credentials(username, passhash, agentkey, false);
+}
+
+function save_and_apply_credentials(username, passhash, agentkey) {
+	save_agent_credentials(username, passhash, agentkey, true);
+}
+
+function bad_wiomw_creds(errorString) {
+	create_login_form(true);
+}
+
+function create_login_form(badcreds) {
+	badcreds = typeof badcreds !== 'undefined' ? badcreds : false;
+	var username;
+	if ($("#wiomw_username").length == 0) {
+		username = "<%=username%>";
+	} else {
+		username = $("#wiomw_username").val();
+	}
+
+	var errorMessage = '';
+	if (badcreds) {
+		errorMessage = '<h3 style="color:#ff0000;"><%:Incorrect username or password.%></h3>';
+	}
+
+	var formHTML =
+	' <fieldset class="cbi-section">' +
+	'  <legend><%:Who Is On My WiFi Login%></legend>' +
+	'  <table>' +
+	'   <tr>' +
+	'    <td>' +
+	'     <img src="https://www.whoisonmywifi.net/images/website_logo.png" alt="<%:Who Is On My WiFi%>" />' +
+	'    </td>' +
+	'    <td>' +
+	'     <form id="wiomw_login">' +
+	'      <fieldset class="cbi-section-node">' +
+	'       <legend><%:Existing Members%></legend>' +
+	errorMessage +
+	'       <div class="cbi-value">' +
+	'        <label class="cbi-value-title" for="wiomw_username"><%:Username%></label>' +
+	'        <div class="cbi-value-field">' +
+	'         <input style="width:300px;" type="text" class="cbi-input-text" name="wiomw_username" id="wiomw_username" value="' + username + '" />' +
+	'        </div>' +
+	'       </div>' +
+	'       <div class="cbi-value">' +
+	'        <label class="cbi-value-title" for="wiomw_password"><%:Password%></label>' +
+	'        <div class="cbi-value-field">' +
+	'         <input style="width:300px;" type="password" class="cbi-input-text" name="wiomw_password" id="wiomw_password" value="" />' +
+	'        </div>' +
+	'       </div>' +
+	'       <br />' +
+	'       <div style="float: right;">' +
+	'        <input class="cbi-button cbi-button-reset" type="reset" value="<%:Reset%>" />' +
+	'        <input class="cbi-button cbi-button-save" type="button" value="<%:Login%>" onclick="return prepare_agent_setup();" />' +
+	'        <input class="cbi-button cbi-button-apply" type="button" value="<%:Login & Apply%>" onclick="return prepare_agent_setup(true);" />' +
+	'       </div>' +
+	'      </fieldset>' +
+	'     </form>' +
+	'     <h3><%:Not a member yet? %><a href="https://www.whoisonmywifi.net/signup"><%:Sign up today!%></a></h3>' +
+	'    </td>' +
+	'   </tr>' +
+	'  </table>' +
+	' </fieldset>';
+
+	$("#wiomw_placeholder").html(formHTML);
+	$("#cbi-apply-wiomw").hide();
+}
+
+function prepare_agent_setup(shouldApply) {
+	shouldApply = typeof shouldApply !== 'undefined' ? shouldApply : false;
+	$("#cbi-apply-wiomw-status").html("<%:Logging in...%>");
+	$("#cbi-apply-wiomw").show();
+	var username = $("#wiomw_username").val();
+	var password = $("#wiomw_password").val();
+	setup_wiomw_agent(
+		username,
+		password,
+		"<%=agentkey%>",
+		"1",
+		shouldApply ? save_and_apply_credentials : only_save_credentials,
+		bad_wiomw_creds);
+}
+
+function wiomw_switch_user() {
+	$("#cbi-apply-wiomw-status").html("<%:Logging out...%>");
+	$("#cbi-apply-wiomw").show();
+	only_save_credentials("<%=username%>", "", "<%=agentkey%>");
+}
+
+function wiomw_logout() {
+	$("#cbi-apply-wiomw-status").html("<%:Logging out...%>");
+	$("#cbi-apply-wiomw").show();
+	save_and_apply_credentials("<%=username%>", "", "<%=agentkey%>");
+}
+
+function create_cred_display() {
+	var formHTML =
+	' <fieldset class="cbi-section">' +
+	'  <legend><%:Who Is On My WiFi Account%></legend>' +
+	'  <table>' +
+	'   <tr>' +
+	'    <td>' +
+	'     <img src="https://www.whoisonmywifi.net/images/website_logo.png" alt="<%:Who Is On My WiFi%>" />' +
+	'    </td>' +
+	'    <td>' +
+	'      <fieldset class="cbi-section-node">' +
+	'       <legend><%:Account Information%></legend>' +
+	'       <div class="cbi-value">' +
+	'        <label class="cbi-value-title" for="wiomw_username"><%:Username%></label>' +
+	'        <div class="cbi-value-field">' +
+	'         <input style="width:300px;" type="text" class="cbi-input-text" id="wiomw_username" disabled="1" value="<%=username%>" />' +
+	'        </div>' +
+	'       </div>' +
+	'       <div class="cbi-value">' +
+	'        <label class="cbi-value-title" for="wiomw_agentkey"><%:Agent Key%></label>' +
+	'        <div class="cbi-value-field">' +
+	'         <input style="width:300px;" type="text" class="cbi-input-text" id="wiomw_agentkey" disabled="1" value="<%=agentkey%>" />' +
+	'        </div>' +
+	'       </div>' +
+	'       <div style="float: right;">' +
+	'        <input class="cbi-button cbi-button-edit" type="button" onclick="wiomw_switch_user();" value="<%:Switch User%>" />' +
+	'        <input class="cbi-button cbi-button-reset" type="button" onclick="wiomw_logout();" value="<%:Logout%>" />' +
+	'       </div>' +
+	'      </fieldset>' +
+	'    </td>' +
+	'   </tr>' +
+	'  </table>' +
+	' </fieldset>';
+
+	$("#wiomw_placeholder").html(formHTML);
+	$("#cbi-apply-wiomw").hide();
+}
+
+function was_valid_wiomw_creds(username, passhash, agentkey) {
+	create_cred_display();
+}
+
+function prepare_creds_check() {
+	var username = "<%=username%>";
+	var passhash = "<%=passhash%>";
+	var agentkey = "<%=agentkey%>";
+
+	if (username == "" || passhash == "" || agentkey == "") {
+		create_login_form();
+	} else {
+		$("#cbi-apply-wiomw-status").html("<%:Checking credentials...%>");
+		$("#cbi-apply-wiomw").show();
+		check_wiomw_creds(
+			username,
+			passhash,
+			agentkey,
+			was_valid_wiomw_creds,
+			bad_wiomw_creds);
+	}
+}
+
+function check_jquery_json() {
+	if (!jQuery().json) {
+		var jqj = document.createElement('script');
+		jqj.type = 'text/javascript';
+		jqj.src = 'https://www.whoisonmywifi.net/js/jquery.json-2.4.min.js';
+		jqj.onload = prepare_creds_check;
+		document.getElementsByTagName('head')[0].appendChild(jqj);
+	} else {
+		$(document).ready(prepare_creds_check);
+	}
+}
+
+if (!window.jQuery) {
+	var jq = document.createElement('script');
+	jq.type = 'text/javascript';
+	jq.src = 'https://www.whoisonmywifi.net/js/jquery-1.9.1.min.js';
+	jq.onload = check_jquery_json;
+	document.getElementsByTagName('head')[0].appendChild(jq);
+} else {
+	$(document).ready(check_jquery_json);
+}
+
+
+//]]>
+</script>
+<%+footer%>
