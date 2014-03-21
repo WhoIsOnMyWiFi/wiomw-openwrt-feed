@@ -8,12 +8,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wiomw
-PKG_VERSION:=1.0.0
+PKG_VERSION:=1.0.1-rc1
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://s3.amazonaws.com/www.whoisonmywifi.com/downloads/linux/
-PKG_MD5SUM:=5e5d8db286f6295044cad8afc34b27be
+PKG_SOURCE_URL:=git://git.io3o.com/csoutherland/wiomw-linux.git
+PKG_SOURCE_PROTO:=git
+PKG_REV:=f5341531a84a60c845a72b2601a649934d498894
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
