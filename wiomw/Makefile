@@ -12,7 +12,7 @@ PKG_VERSION:=1.0.1-rc1
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=git://git.io3o.com/csoutherland/wiomw-linux.git
+PKG_SOURCE_URL:=ssh://git.io3o.com/csoutherland/wiomw-linux.git
 PKG_SOURCE_PROTO:=git
 PKG_REV:=f5341531a84a60c845a72b2601a649934d498894
 
