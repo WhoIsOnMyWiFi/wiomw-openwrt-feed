@@ -8,11 +8,11 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wiomw
-PKG_VERSION:=1.0.1
+PKG_VERSION:=1.0.2-rc1
 PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
-PKG_REV:=ea431989c669ab83bc6454d5119c7e44bcac7103
+PKG_REV:=ed85a4511462e72287037830784451c740aa8a10
 PKG_SOURCE_URL:=ssh://git.io3o.com/csoutherland/wiomw-linux.git
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_SUBDIR:=${PKG_NAME}-${PKG_VERSION}
@@ -58,6 +58,13 @@ CONFIGURE_ARGS+= \
 
 define Package/wiomw/postinst
 #!/bin/sh
+# use the new config file if there isn't an old one
+if [ -e /etc/config/wiomw ]; then
+	echo "Keeping previous wiomw UCI file"
+else
+	echo "Creating new wiomw UCI file"
+	mv /etc/config/wiomw.new /etc/config/wiomw
+fi
 # add wiomw to init
 if [ -z "$${IPKG_INSTROOT}" ]; then
         echo "Enabling rc.d symlink for wiomw"
@@ -101,7 +108,7 @@ define Package/wiomw/install
 	$(INSTALL_DIR) $(1)/etc/ssl/certs
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/etc/ssl/certs/f081611a.0 $(1)/etc/ssl/certs/
 	$(INSTALL_DIR) $(1)/etc/config
-	$(INSTALL_CONF) ./files/wiomw.uci $(1)/etc/config/wiomw
+	$(INSTALL_CONF) ./files/wiomw.uci $(1)/etc/config/wiomw.new
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/sbin/wiomw-agent $(1)/usr/sbin/
 	$(INSTALL_DIR) $(1)/etc/init.d
