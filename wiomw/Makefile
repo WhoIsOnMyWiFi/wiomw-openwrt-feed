@@ -8,11 +8,11 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wiomw
-PKG_VERSION:=1.0.2
+PKG_VERSION:=1.0.3-rc1
 PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
-PKG_REV:=3419d3e27b92043fadebfad6d06e9b42b3fd8a94
+PKG_REV:=c9ef68f517a86fb4d844bc369014e7e84d817bd9
 PKG_SOURCE_URL:=ssh://git.io3o.com/csoutherland/wiomw-linux.git
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_SUBDIR:=${PKG_NAME}-${PKG_VERSION}
