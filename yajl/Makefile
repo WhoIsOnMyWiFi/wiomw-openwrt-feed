@@ -38,7 +38,7 @@ endef
 PKG_INSTALL:=1
 
 CMAKE_OPTIONS += \
-	-DCMAKE_BUILD_TYPE:String="Release" \
+	-DCMAKE_BUILD_TYPE:String="Release" 
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include
