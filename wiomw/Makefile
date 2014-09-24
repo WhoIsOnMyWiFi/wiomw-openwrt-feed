@@ -89,7 +89,7 @@ fi
 exit 0
 endef
 
-define Package/luci-app-wiomw/postrm
+define Package/wiomw/postrm
 #!/bin/sh
 which uci > /dev/null || exit 0
 uci -q get ucitrack.@wiomw[0] > /dev/null && {
@@ -98,7 +98,7 @@ uci -q get ucitrack.@wiomw[0] > /dev/null && {
 }
 endef
 
-define Package/conffiles
+define Package/wiomw/conffiles
   /etc/config/wiomw
 endef
 
