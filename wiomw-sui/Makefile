@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wiomw-sui
 PKG_VERSION:=0.0.2
-PKG_RELEASE:=4
+PKG_RELEASE:=5
 
 PKG_SOURCE_PROTO:=git
 PKG_REV:=aab816ae79e66ccd9882538338a83fe64fbffbc1
@@ -26,7 +26,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/wiomw-sui
   SECTION:=admin
   CATEGORY:=Administration
-  DEPENDS:=+wiomw +uhttpd +yajl +libuci
+  DEPENDS:=+wiomw +lighttpd +lighttpd-mod-fastcgi +fcgi +yajl +libuci
   TITLE:=Simple UI (includes Who Is On My WiFi)
   URL:=http://www.whoisonmywifi.com/
   MAINTAINER:=support@whoisonmywifi.com
@@ -37,6 +37,7 @@ define Package/wiomw-sui/description
 endef
 
 CONFIGURE_ARGS+= \
+		--with-fcgi \
 		--bindir=/www/cgi-bin
 
 define Package/wiomw-sui/install
