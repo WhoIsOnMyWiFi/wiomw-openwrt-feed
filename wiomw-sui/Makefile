@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wiomw-sui
 PKG_VERSION:=0.0.4
-PKG_RELEASE:=2
+PKG_RELEASE:=3
 
 PKG_SOURCE_PROTO:=git
 PKG_REV:=80e002ed662a0173723b8c35779375c9e4c9181a
@@ -37,6 +37,7 @@ define Package/wiomw-sui/description
 endef
 
 CONFIGURE_ARGS+= \
+		--without-fcgi \
 		--bindir=/www/cgi-bin
 
 define Package/wiomw-sui/install
