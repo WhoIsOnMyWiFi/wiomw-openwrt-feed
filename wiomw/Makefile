@@ -109,6 +109,7 @@ define Package/wiomw/install
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/etc/ssl/certs/f081611a.0 $(1)/etc/ssl/certs/
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_CONF) ./files/wiomw.uci $(1)/etc/config/wiomw.new
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./files/wiomw.defaults $(1)/etc/uci-defaults/wiomw-setup
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/sbin/wiomw-agent $(1)/usr/sbin/
