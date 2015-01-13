@@ -8,11 +8,11 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wiomw
-PKG_VERSION:=1.0.3-rc4
-PKG_RELEASE:=1
+PKG_VERSION:=1.0.4-rc1
+PKG_RELEASE:=2
 
 PKG_SOURCE_PROTO:=git
-PKG_REV:=69e1f84ef8c6e8af77e4d082a1a959194b45e2cf
+PKG_REV:=7fa05758c659764d2fdc04a184a7a54bbcb8a2b8
 PKG_SOURCE_URL:=ssh://git.io3o.com/csoutherland/wiomw-linux.git
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_SUBDIR:=${PKG_NAME}-${PKG_VERSION}
@@ -109,6 +109,7 @@ define Package/wiomw/install
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/etc/ssl/certs/f081611a.0 $(1)/etc/ssl/certs/
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_CONF) ./files/wiomw.uci $(1)/etc/config/wiomw.new
+	$(INSTALL_BIN) ./files/wiomw.defaults $(1)/etc/uci-defaults/wiomw-setup
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/sbin/wiomw-agent $(1)/usr/sbin/
 	$(INSTALL_DIR) $(1)/etc/init.d

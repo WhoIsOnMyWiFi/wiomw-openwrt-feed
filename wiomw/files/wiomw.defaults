@@ -1,0 +1,6 @@
+#!/bin/sh
+touch /etc/config/wiomw
+uci set wiomw.agent=wiomw-agent
+uci set wiomw.agent.agentkey=openwrt-placeholder
+uci commit wiomw
+exit 0
