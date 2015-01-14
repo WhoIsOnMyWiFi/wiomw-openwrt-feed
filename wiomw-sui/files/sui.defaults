@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# security settings
+uci set dropbear.@dropbear[0].interface=lan
+uci commit dropbear
+uci set wireless.@wifi-iface[0].encryption=psk2+ccmp
+#uci commit wireless
+
+# usability settings
+uci set wireless.@wifi-device[0].channel=auto
+#uci commit wireless
+
+# sui-specific settings
+touch /etc/config/sui
+uci set sui.changed=settings
+uci commit sui
+
+# Who Is On My WiFi specific settings to simplify setup instructions
+uci set system.@system[0].hostname=MyRouter
+uci commit system
+BSSID=`ifconfig | grep wlan0 | awk '{print $5}' | head -n1 | tr -d :`
+uci set wireless.@wifi-iface[0].ssid="mywifi-$BSSID"
+uci commit wireless
+
+exit 0

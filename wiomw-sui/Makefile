@@ -41,6 +41,8 @@ CONFIGURE_ARGS+= \
 		--bindir=/www/cgi-bin
 
 define Package/wiomw-sui/install
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
+	$(INSTALL_BIN) ./files/sui.defaults $(1)/etc/uci-defaults/sui-setup
 	$(INSTALL_DIR) $(1)/www
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/www-static/index.html $(1)/www/
 	$(INSTALL_DIR) $(1)/www/cgi-bin
