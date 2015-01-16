@@ -28,7 +28,7 @@ uci commit sui
 # Who Is On My WiFi specific settings to simplify setup instructions
 uci set system.@system[0].hostname=MyRouter
 uci commit system
-BSSID=`ifconfig | awk '$1=="eth0"{print $5}' | head -n1 | tr -d :`
+BSSID=`ifconfig -a | awk '$1=="eth0"{print $5}' | head -n1 | tr -d :`
 PSK=`echo $BSSID | md5sum - | awk '{print substr($1, 1, 4) "-" substr($1, 5, 4) "-" substr($1, 9, 4);}'`
 uci set wireless.@wifi-iface[0].ssid="mywifi-$BSSID"
 uci set wireless.@wifi-iface[0].key="$PSK"
