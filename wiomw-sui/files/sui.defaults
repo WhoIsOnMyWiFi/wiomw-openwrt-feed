@@ -1,13 +1,23 @@
 #!/bin/sh
 
+DUAL_RADIO=`uci get wireless.@wifi-device[1] >/dev/null 2>/dev/null; if [ $? -eq 0 ]; then echo true; fi`
+
 # security settings
 uci set dropbear.@dropbear[0].interface=lan
 uci commit dropbear
 uci set wireless.@wifi-iface[0].encryption=psk2+ccmp
+if [ "$DUAL_RADIO" == true ]
+then
+	uci set wireless.@wifi-iface[1].encryption=psk2+ccmp
+fi
 #uci commit wireless
 
 # usability settings
 uci set wireless.@wifi-device[0].channel=auto
+if [ "$DUAL_RADIO" == true ]
+then
+	uci set wireless.@wifi-device[1].channel=auto
+fi
 #uci commit wireless
 
 # sui-specific settings
@@ -23,6 +33,12 @@ PSK=`echo $BSSID | md5sum - | awk '{print substr($1, 1, 4) "-" substr($1, 5, 4) 
 uci set wireless.@wifi-iface[0].ssid="mywifi-$BSSID"
 uci set wireless.@wifi-iface[0].key="$PSK"
 uci delete wireless.@wifi-device[0].disabled
+if [ "$DUAL_RADIO" == true ]
+then
+	uci set wireless.@wifi-iface[1].ssid="mywifi-$BSSID"
+	uci set wireless.@wifi-iface[1].key="$PSK"
+	uci delete wireless.@wifi-device[1].disabled
+fi
 uci commit wireless
 
 exit 0
