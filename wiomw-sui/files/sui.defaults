@@ -22,7 +22,15 @@ fi
 
 # sui-specific settings
 touch /etc/config/sui
-uci set sui.changed=settings
+uci set sui.changed=status
+uci set sui.system=properties
+if [ "$DUAL_RADIO" == true ]
+then
+	uci set sui.system.model="tl-wdr3500-v1"
+	uci set sui.system.dualradio="1"
+else
+	uci set sui.system.model="tl-wr740n-v4"
+fi
 uci commit sui
 
 # Who Is On My WiFi specific settings to simplify setup instructions
