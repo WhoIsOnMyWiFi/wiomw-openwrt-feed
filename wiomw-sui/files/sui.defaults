@@ -36,17 +36,7 @@ uci commit sui
 # Who Is On My WiFi specific settings to simplify setup instructions
 uci set system.@system[0].hostname=MyRouter
 uci commit system
-BSSID=`ifconfig -a | awk '$1=="eth0"{print $5}' | head -n1 | tr -d :`
-PSK=`echo $BSSID | md5sum - | awk '{print substr($1, 1, 4) "-" substr($1, 5, 4) "-" substr($1, 9, 4);}'`
-uci set wireless.@wifi-iface[0].ssid="mywifi-$BSSID"
-uci set wireless.@wifi-iface[0].key="$PSK"
-uci delete wireless.@wifi-device[0].disabled
-if [ "$DUAL_RADIO" == true ]
-then
-	uci set wireless.@wifi-iface[1].ssid="mywifi-$BSSID"
-	uci set wireless.@wifi-iface[1].key="$PSK"
-	uci delete wireless.@wifi-device[1].disabled
-fi
-uci commit wireless
+
+sed -i "s/^\tjffs2reset -y \&\& reboot \&$/\tif \[ -r \"\/etc\/factory\.tar\.gz\" \]\n\tthen\n\t\tcp \/etc\/factory\.tar\.gz \/tmp\/factory\.tar\.gz \&\& \\\\\n\t\tjffs2reset -y \&\& \\\\\n\t\tcp \/tmp\/factory\.tar\.gz \/etc\/factory\.tar\.gz \&\& \\\\\n\t\ttar xzf \/tmp\/factory\.tar\.gz \&\& \\\\\n\t\tsync \&\& \\\\\n\t\treboot \&\n\telse\n\t\tjffs2reset -y \&\& reboot \&\n\tfi/" /etc/rc.button/reset
 
 exit 0
