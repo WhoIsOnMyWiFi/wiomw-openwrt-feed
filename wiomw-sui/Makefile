@@ -8,11 +8,11 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wiomw-sui
-PKG_VERSION:=0.2.4
-PKG_RELEASE:=3
+PKG_VERSION:=0.2.5
+PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
-PKG_REV:=0cef9dbef47a656c816c928642cbd3f22e115def
+PKG_REV:=2c61e246f8fe315483b1e832a013212edfa4d5b2
 PKG_SOURCE_URL:=ssh://git.io3o.com/csoutherland/openwrt-sui.git
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_SUBDIR:=${PKG_NAME}-${PKG_VERSION}
