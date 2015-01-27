@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wiomw-sui
 PKG_VERSION:=0.2.6
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_SOURCE_PROTO:=git
 PKG_REV:=dc53af11187b3439e5ecf65661e6b01df0fae4b7
@@ -47,6 +47,10 @@ define Package/wiomw-sui/install
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/www-static/index.html $(1)/www/
 	$(INSTALL_DIR) $(1)/www/cgi-bin
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/www/cgi-bin/*.cgi $(1)/www/cgi-bin/
+	$(INSTALL_DIR) $(1)/www/css
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/www-static/css/*.css $(1)/www/css
+	$(INSTALL_DIR) $(1)/www/js
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/www-static/js/*.js $(1)/www/js
 endef
 
 $(eval $(call BuildPackage,wiomw-sui))
