@@ -8,11 +8,11 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wiomw-sui
-PKG_VERSION:=0.2.9
+PKG_VERSION:=0.2.10
 PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
-PKG_REV:=7898f05ad3b8c6fe13f3ca4104befbcbfbb96560
+PKG_REV:=4d94b002d8e2e6936f48a9a9f8b46a9410d19b4a
 PKG_SOURCE_URL:=ssh://git.io3o.com/csoutherland/openwrt-sui.git
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_SUBDIR:=${PKG_NAME}-${PKG_VERSION}
@@ -38,7 +38,8 @@ endef
 
 CONFIGURE_ARGS+= \
 		--without-fcgi \
-		--bindir=/www/cgi-bin
+		--bindir=/www/cgi-bin \
+		--with-release=$(PKG_RELEASE)
 
 define Package/wiomw-sui/install
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
