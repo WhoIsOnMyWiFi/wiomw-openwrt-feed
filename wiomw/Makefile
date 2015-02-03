@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wiomw
 PKG_VERSION:=1.0.4-rc1
-PKG_RELEASE:=3
+PKG_RELEASE:=4
 
 PKG_SOURCE_PROTO:=git
 PKG_REV:=7fa05758c659764d2fdc04a184a7a54bbcb8a2b8
@@ -58,24 +58,11 @@ CONFIGURE_ARGS+= \
 
 define Package/wiomw/postinst
 #!/bin/sh
-# use the new config file if there isn't an old one
-if [ -e /etc/config/wiomw ]; then
-	echo "Keeping previous wiomw UCI file"
-else
-	echo "Creating new wiomw UCI file"
-	mv /etc/config/wiomw.new /etc/config/wiomw
-fi
 # add wiomw to init
 if [ -z "$${IPKG_INSTROOT}" ]; then
         echo "Enabling rc.d symlink for wiomw"
         /etc/init.d/wiomw enable
 fi
-# add wiomw to ucitrack
-uci -q get ucitrack.@wiomw[0] > /dev/null || {
-  uci add ucitrack wiomw > /dev/null
-  uci set ucitrack.@wiomw[0].init=wiomw
-  uci commit
-}
 exit 0
 endef
 
@@ -89,26 +76,9 @@ fi
 exit 0
 endef
 
-define Package/wiomw/postrm
-#!/bin/sh
-which uci > /dev/null || exit 0
-uci -q get ucitrack.@wiomw[0] > /dev/null && {
-  uci delete ucitrack.@wiomw[0]
-  uci commit
-}
-endef
-
-define Package/wiomw/conffiles
-  /etc/config/wiomw
-endef
-
 define Package/wiomw/install
-	$(INSTALL_DIR) $(1)/etc
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/etc/wiomw.conf.example $(1)/etc/
 	$(INSTALL_DIR) $(1)/etc/ssl/certs
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/etc/ssl/certs/f081611a.0 $(1)/etc/ssl/certs/
-	$(INSTALL_DIR) $(1)/etc/config
-	$(INSTALL_CONF) ./files/wiomw.uci $(1)/etc/config/wiomw.new
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./files/wiomw.defaults $(1)/etc/uci-defaults/wiomw-setup
 	$(INSTALL_DIR) $(1)/usr/sbin

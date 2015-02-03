@@ -1,4 +1,0 @@
-
-config wiomw-agent agent
-	option agentkey 'openwrt-placeholder'
-
