@@ -39,5 +39,6 @@ uci commit system
 grep "^/etc/\.FACTORY_DEFAULTS$" /etc/sysupgrade.conf || echo "/etc/.FACTORY_DEFAULTS" >> /etc/sysupgrade.conf
 
 sed -i "s/^\tjffs2reset -y \&\& reboot \&$/\tif \[ -r \"\/etc\/\.FACTORY_DEFAULTS\" \]\n\tthen\n\t\tcp \/etc\/\.FACTORY_DEFAULTS \/tmp\/FACTORY_DEFAULTS\.tar\.gz \&\& \\\\\n\t\tjffs2reset -y \&\& \\\\\n\t\tcp \/tmp\/FACTORY_DEFAULTS\.tar\.gz \/etc\/\.FACTORY_DEFAULTS \&\& \\\\\n\t\ttar xzf \/tmp\/FACTORY_DEFAULTS\.tar\.gz \&\& \\\\\n\t\tsync \&\& \\\\\n\t\treboot \&\n\telse\n\t\tjffs2reset -y \&\& reboot \&\n\tfi/" /etc/rc.button/reset
+ln -s /etc/rc.button/reset /etc/rc.button/wps
 
 exit 0
