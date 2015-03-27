@@ -8,11 +8,11 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wiomw-sui
-PKG_VERSION:=0.3.13
+PKG_VERSION:=0.4.0
 PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
-PKG_REV:=4f58e0b2a6ad6d757c842a9e4f41f69cd419de08
+PKG_REV:=16033597a03d565ab03dc023c38f464dcba295fd
 PKG_SOURCE_URL:=ssh://git.io3o.com/csoutherland/openwrt-sui.git
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_SUBDIR:=${PKG_NAME}-${PKG_VERSION}
@@ -41,9 +41,33 @@ CONFIGURE_ARGS+= \
 		--bindir=/www/cgi-bin \
 		--with-release=$(PKG_RELEASE)
 
+define Package/wiomw-sui/postinst
+#!/bin/sh
+# add xsrfd to init
+if [ -z "$${IPKG_INSTROOT}" ]; then
+        echo "Enabling rc.d symlink for xsrfd"
+        /etc/init.d/xsrfd enable
+fi
+exit 0
+endef
+
+define Package/wiomw-sui/prerm
+#!/bin/sh
+# check if we are on real system
+if [ -z "$${IPKG_INSTROOT}" ]; then
+        echo "Removing rc.d symlink for xsrfd"
+        /etc/init.d/xsrfd disable
+fi
+exit 0
+endef
+
 define Package/wiomw-sui/install
+	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/xsrfd.init $(1)/etc/init.d/xsrfd
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./files/sui.defaults $(1)/etc/uci-defaults/sui-setup
+	$(INSTALL_DIR) $(1)/usr/sbin
+	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/sbin/xsrfd $(1)/usr/sbin/
 	$(INSTALL_DIR) $(1)/www
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/www-static/index.html $(1)/www/
 	$(INSTALL_DIR) $(1)/www/cgi-bin
