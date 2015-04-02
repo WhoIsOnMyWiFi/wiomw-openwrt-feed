@@ -27,7 +27,7 @@ uci set sui.changed=status
 uci set sui.system=properties
 if [ "$DUAL_RADIO" == true ]
 then
-	uci set sui.system.dualradio="1"
+	uci set sui.system.dualradio=1
 fi
 uci set sui.system.model="`ar71xx_board_name`"
 uci commit sui
@@ -35,6 +35,12 @@ uci commit sui
 # Who Is On My WiFi specific settings to simplify setup instructions
 uci set system.@system[0].hostname=MyRouter
 uci commit system
+LAN_IP="`uci get network.lan.ipaddr`"
+uci set dhcp.easydomain=domain
+uci set dhcp.easydomain.name="setup.whoisonmywifi.net"
+uci set dhcp.easydomain.ip="$LAN_IP"
+uci commit dhcp
+
 
 grep "^/etc/\.FACTORY_DEFAULTS$" /etc/sysupgrade.conf || echo "/etc/.FACTORY_DEFAULTS" >> /etc/sysupgrade.conf
 
