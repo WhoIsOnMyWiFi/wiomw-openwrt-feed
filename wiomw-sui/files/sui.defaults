@@ -1,12 +1,12 @@
 #!/bin/sh
 
-DUAL_RADIO=`uci -q get wireless.@wifi-device[1] && echo true`
+DUAL_RADIO=`uci -q get wireless.@wifi-device[1] > /dev/null && echo true`
 
 # security settings
 uci set dropbear.@dropbear[0].interface=lan
 uci commit dropbear
 uci set wireless.@wifi-iface[0].encryption=psk2+ccmp
-if [ "$DUAL_RADIO" == true ]
+if [ "$DUAL_RADIO" == "true" ]
 then
 	uci set wireless.@wifi-iface[1].encryption=psk2+ccmp
 fi
@@ -14,7 +14,7 @@ fi
 
 # usability settings
 uci set wireless.@wifi-device[0].channel=auto
-if [ "$DUAL_RADIO" == true ]
+if [ "$DUAL_RADIO" == "true" ]
 then
 	uci set wireless.@wifi-device[1].channel=auto
 fi
@@ -25,7 +25,7 @@ fi
 touch /etc/config/sui
 uci set sui.changed=status
 uci set sui.system=properties
-if [ "$DUAL_RADIO" == true ]
+if [ "$DUAL_RADIO" == "true" ]
 then
 	uci set sui.system.dualradio=1
 fi
