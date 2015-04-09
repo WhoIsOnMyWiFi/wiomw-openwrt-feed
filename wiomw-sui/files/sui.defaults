@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DUAL_RADIO=`uci -q get wireless.@wifi-device[1] > /dev/null && echo true`
+DUAL_RADIO=`uci -q get wireless.@wifi-device[1] > /dev/null 2> /dev/null && echo true`
 
 # security settings
 uci set dropbear.@dropbear[0].interface=lan
