@@ -75,7 +75,7 @@ function handle_messages() {
 		if (e.origin != 'https://www.whoisonmywifi.net') {
 			$.postMessage($.toJSON({'errors':['Bad origin']}), 'https://www.whoisonmywifi.net', $('#iframe').get(0).contentWindow);
 		} else if (e.data != '') {
-			var data $.parseJSON(e.data);
+			var data = $.parseJSON(e.data);
 			if ('errors' in data && data.errors.length != 0) {
 				/* TODO */
 			} else if ('ready' in data && data.ready === true) {
@@ -92,13 +92,14 @@ function handle_messages() {
 		}
 	});
 	$('#wiomw_placeholder').html('<iframe id="iframe" src="https://www.whoisonmywifi.net/api/v100/rest/iframe_luci.php?protocol=' + encodeURIComponent(window.location.protocol) + '&host=' + encodeURIComponent(window.location.host) + '"></iframe>');
+	$("#cbi-apply-wiomw").hide();
 }
 
 function check_jquery_postmessage() {
 	if (!jQuery().postMessage) {
 		var jqp = document.createElement('script');
 		jqp.type = 'text/javascript';
-		jqp.src = 'https://www.whoisonmywifi.net/js/jquery.ba-postmessage-0.5.min.js';
+		jqp.src = 'https://www.whoisonmywifi.net/api/v100/rest/js/jquery.ba-postmessage-0.5.min.js';
 		jqp.onload = handle_messages;
 		document.getElementsByTagName('head')[0].appendChild(jqp);
 	} else {
@@ -110,7 +111,7 @@ function check_jquery_browser() {
 	if (!jQuery().browser) {
 		var jqb = document.createElement('script');
 		jqb.type = 'text/javascript';
-		jqb.src = 'https://www.whoisonmywifi.net/js/jquery.browser-0.0.7.min.js';
+		jqb.src = 'https://www.whoisonmywifi.net/api/v100/rest/js/jquery.browser-0.0.7.min.js';
 		jqb.onload = check_jquery_postmessage;
 		document.getElementsByTagName('head')[0].appendChild(jqb);
 	} else {

@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-wiomw
 PKG_VERSION:=1.0.4-rc1
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 LUCI_DIR:=/usr/lib/lua/luci
 
 include $(INCLUDE_DIR)/package.mk
