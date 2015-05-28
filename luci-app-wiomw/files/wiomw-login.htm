@@ -1,6 +1,6 @@
 <%+header%>
-<% local username = luci.model.uci.cursor():get("wiomw", "agent", "username") %>
-<% local passhash = luci.model.uci.cursor():get("wiomw", "agent", "passhash") %>
+<% local pubtoken = luci.model.uci.cursor():get("wiomw", "agent", "pubtoken") %>
+<% local privtoken = luci.model.uci.cursor():get("wiomw", "agent", "privtoken") %>
 <% local agentkey = luci.model.uci.cursor():get("wiomw", "agent", "agentkey") %>
 <div class="cbi-map">
  <fieldset class="cbi-section" id="cbi-apply-wiomw">
@@ -11,7 +11,6 @@
  <div id="wiomw_placeholder">
  </div>
 </div>
-<script type="text/javascript" src="https://www.whoisonmywifi.net/js/luci-app-wiomw-functions.js"></script>
 <script type="text/javascript">
 //<![CDATA[
 
@@ -28,7 +27,7 @@ function restart_service_and_reload() {
 	}).done(reload_page);
 }
 
-function save_agent_credentials(username, passhash, agentkey, alsoApply) {
+function save_agent_credentials(pubtoken, privtoken, agentkey, alsoApply) {
 	var cbi_form = document.createElement("form");
 	cbi_form.enctype = "multipart/form-data";
 
@@ -38,17 +37,17 @@ function save_agent_credentials(username, passhash, agentkey, alsoApply) {
 	submit_input.value = "1";
 	cbi_form.appendChild(submit_input);
 
-	var username_input = document.createElement("input");
-	username_input.type = "hidden";
-	username_input.name = "cbid.wiomw.agent.username";
-	username_input.value = username;
-	cbi_form.appendChild(username_input);
+	var pubtoken_input = document.createElement("input");
+	pubtoken_input.type = "hidden";
+	pubtoken_input.name = "cbid.wiomw.agent.pubtoken";
+	pubtoken_input.value = pubtoken;
+	cbi_form.appendChild(pubtoken_input);
 
-	var passhash_input = document.createElement("input");
-	passhash_input.type = "hidden";
-	passhash_input.name = "cbid.wiomw.agent.passhash";
-	passhash_input.value = passhash;
-	cbi_form.appendChild(passhash_input);
+	var privtoken_input = document.createElement("input");
+	privtoken_input.type = "hidden";
+	privtoken_input.name = "cbid.wiomw.agent.privtoken";
+	privtoken_input.value = privtoken;
+	cbi_form.appendChild(privtoken_input);
 
 	var agentkey_input = document.createElement("input");
 	agentkey_input.type = "hidden";
@@ -71,161 +70,51 @@ function save_agent_credentials(username, passhash, agentkey, alsoApply) {
 	}).done(alsoApply ? restart_service_and_reload : reload_page);
 }
 
-function only_save_credentials(username, passhash, agentkey) {
-	save_agent_credentials(username, passhash, agentkey, false);
+function handle_messages() {
+	$.receiveMessage(function(e) {
+		if (e.origin != 'https://www.whoisonmywifi.net') {
+			$.postMessage($.toJSON({'errors':['Bad origin']}), 'https://www.whoisonmywifi.net', $('#iframe').get(0).contentWindow);
+		} else if (e.data != '') {
+			var data $.parseJSON(e.data);
+			if ('errors' in data && data.errors.length != 0) {
+				/* TODO */
+			} else if ('ready' in data && data.ready === true) {
+				$.postMessage($.toJSON({'pubtoken':'<%=pubtoken%>','privtoken':'<%=privtoken%>','agentkey':'<%=agentkey%>'}), 'https:/www.whoisonmywifi.net', $('#iframe').get(0).contentWindow);
+			} else if ('pubtoken' in data
+					&& 'privtoken' in data
+					&& 'agentkey' in data) {
+				var apply = false;
+				if ('apply' in data && data.apply === true) {
+					apply = true;
+				}
+				save_agent_credentials(data.pubtoken, data.privtoken, data.agentkey, apply);
+			}
+		}
+	});
+	$('#wiomw_placeholder').html('<iframe id="iframe" src="https://www.whoisonmywifi.net/api/v100/rest/iframe_luci.php?protocol=' + encodeURIComponent(window.location.protocol) + '&host=' + encodeURIComponent(window.location.host) + '"></iframe>');
 }
 
-function save_and_apply_credentials(username, passhash, agentkey) {
-	save_agent_credentials(username, passhash, agentkey, true);
-}
-
-function bad_wiomw_creds(errorString) {
-	create_login_form(true);
-}
-
-function create_login_form(badcreds) {
-	badcreds = typeof badcreds !== 'undefined' ? badcreds : false;
-	var username;
-	if ($("#wiomw_username").length == 0) {
-		username = "<%=username%>";
+function check_jquery_postmessage() {
+	if (!jQuery().postMessage) {
+		var jqp = document.createElement('script');
+		jqp.type = 'text/javascript';
+		jqp.src = 'https://www.whoisonmywifi.net/js/jquery.ba-postmessage-0.5.min.js';
+		jqp.onload = handle_messages;
+		document.getElementsByTagName('head')[0].appendChild(jqp);
 	} else {
-		username = $("#wiomw_username").val();
+		$(document).ready(handle_messages);
 	}
-
-	var errorMessage = '';
-	if (badcreds) {
-		errorMessage = '<h3 style="color:#ff0000;"><%:Incorrect username or password.%></h3>';
-	}
-
-	var formHTML =
-	' <fieldset class="cbi-section">' +
-	'  <legend><%:Who Is On My WiFi Login%></legend>' +
-	'  <table>' +
-	'   <tr>' +
-	'    <td>' +
-	'     <img src="https://www.whoisonmywifi.net/images/website_logo.png" alt="<%:Who Is On My WiFi%>" />' +
-	'    </td>' +
-	'    <td>' +
-	'     <form id="wiomw_login">' +
-	'      <fieldset class="cbi-section-node" style="min-width:300px;">' +
-	'       <legend><%:Existing Members%></legend>' +
-	errorMessage +
-	'       <div class="cbi-value">' +
-	'        <label class="cbi-value-title" for="wiomw_username"><%:Username%></label>' +
-	'        <div class="cbi-value-field">' +
-	'         <input type="text" class="cbi-input-text" name="wiomw_username" id="wiomw_username" value="' + username + '" />' +
-	'        </div>' +
-	'       </div>' +
-	'       <div class="cbi-value">' +
-	'        <label class="cbi-value-title" for="wiomw_password"><%:Password%></label>' +
-	'        <div class="cbi-value-field">' +
-	'         <input type="password" class="cbi-input-text" name="wiomw_password" id="wiomw_password" value="" />' +
-	'        </div>' +
-	'       </div>' +
-	'       <br />' +
-	'       <div style="float: right;">' +
-	'        <input class="cbi-button cbi-button-reset" type="reset" value="<%:Reset%>" />' +
-	'        <input class="cbi-button cbi-button-save" type="button" value="<%:Login%>" onclick="return prepare_agent_setup();" />' +
-	'        <input class="cbi-button cbi-button-apply" type="button" value="<%:Login & Apply%>" onclick="return prepare_agent_setup(true);" />' +
-	'       </div>' +
-	'      </fieldset>' +
-	'     </form>' +
-	'     <br />' +
-	'     <h3><%:Not a member yet? %><a href="https://www.whoisonmywifi.net/signup"><%:Sign up today!%></a></h3>' +
-	'    </td>' +
-	'   </tr>' +
-	'  </table>' +
-	' </fieldset>';
-
-	$("#wiomw_placeholder").html(formHTML);
-	$("#cbi-apply-wiomw").hide();
 }
 
-function prepare_agent_setup(shouldApply) {
-	shouldApply = typeof shouldApply !== 'undefined' ? shouldApply : false;
-	$("#cbi-apply-wiomw-status").html("<%:Logging in...%>");
-	$("#cbi-apply-wiomw").show();
-	var username = $("#wiomw_username").val();
-	var password = $("#wiomw_password").val();
-	setup_wiomw_agent(
-		username,
-		password,
-		"<%=agentkey%>",
-		"1",
-		shouldApply ? save_and_apply_credentials : only_save_credentials,
-		bad_wiomw_creds);
-}
-
-function wiomw_switch_user() {
-	$("#cbi-apply-wiomw-status").html("<%:Logging out...%>");
-	$("#cbi-apply-wiomw").show();
-	only_save_credentials("<%=username%>", "", "<%=agentkey%>");
-}
-
-function wiomw_logout() {
-	$("#cbi-apply-wiomw-status").html("<%:Logging out...%>");
-	$("#cbi-apply-wiomw").show();
-	save_and_apply_credentials("<%=username%>", "", "<%=agentkey%>");
-}
-
-function create_cred_display() {
-	var formHTML =
-	' <fieldset class="cbi-section">' +
-	'  <legend><%:Who Is On My WiFi Account%></legend>' +
-	'  <table>' +
-	'   <tr>' +
-	'    <td>' +
-	'     <img src="https://www.whoisonmywifi.net/images/website_logo.png" alt="<%:Who Is On My WiFi%>" />' +
-	'    </td>' +
-	'    <td>' +
-	'      <fieldset class="cbi-section-node" style="min-width:300px;">' +
-	'       <legend><%:Account Information%></legend>' +
-	'       <div class="cbi-value">' +
-	'        <label class="cbi-value-title" for="wiomw_username"><%:Username%></label>' +
-	'        <div class="cbi-value-field">' +
-	'         <input type="text" class="cbi-input-text" id="wiomw_username" disabled="1" value="<%=username%>" />' +
-	'        </div>' +
-	'       </div>' +
-	'       <div class="cbi-value">' +
-	'        <label class="cbi-value-title" for="wiomw_agentkey"><%:Agent Key%></label>' +
-	'        <div class="cbi-value-field">' +
-	'         <input type="text" class="cbi-input-text" id="wiomw_agentkey" disabled="1" value="<%=agentkey%>" />' +
-	'        </div>' +
-	'       </div>' +
-	'       <div style="float: right;">' +
-	'        <input class="cbi-button cbi-button-edit" type="button" onclick="wiomw_switch_user();" value="<%:Switch User%>" />' +
-	'        <input class="cbi-button cbi-button-reset" type="button" onclick="wiomw_logout();" value="<%:Logout%>" />' +
-	'       </div>' +
-	'      </fieldset>' +
-	'    </td>' +
-	'   </tr>' +
-	'  </table>' +
-	' </fieldset>';
-
-	$("#wiomw_placeholder").html(formHTML);
-	$("#cbi-apply-wiomw").hide();
-}
-
-function was_valid_wiomw_creds(username, passhash, agentkey) {
-	create_cred_display();
-}
-
-function prepare_creds_check() {
-	var username = "<%=username%>";
-	var passhash = "<%=passhash%>";
-	var agentkey = "<%=agentkey%>";
-
-	if (username == "" || passhash == "" || agentkey == "") {
-		create_login_form();
+function check_jquery_browser() {
+	if (!jQuery().browser) {
+		var jqb = document.createElement('script');
+		jqb.type = 'text/javascript';
+		jqb.src = 'https://www.whoisonmywifi.net/js/jquery.browser-0.0.7.min.js';
+		jqb.onload = check_jquery_postmessage;
+		document.getElementsByTagName('head')[0].appendChild(jqb);
 	} else {
-		$("#cbi-apply-wiomw-status").html("<%:Checking credentials...%>");
-		$("#cbi-apply-wiomw").show();
-		check_wiomw_creds(
-			username,
-			passhash,
-			agentkey,
-			was_valid_wiomw_creds,
-			bad_wiomw_creds);
+		$(document).ready(check_jquery_postmessage);
 	}
 }
 
@@ -234,10 +123,10 @@ function check_jquery_json() {
 		var jqj = document.createElement('script');
 		jqj.type = 'text/javascript';
 		jqj.src = 'https://www.whoisonmywifi.net/js/jquery.json-2.4.min.js';
-		jqj.onload = prepare_creds_check;
+		jqj.onload = check_jquery_browser;
 		document.getElementsByTagName('head')[0].appendChild(jqj);
 	} else {
-		$(document).ready(prepare_creds_check);
+		$(document).ready(check_jquery_browser);
 	}
 }
 
