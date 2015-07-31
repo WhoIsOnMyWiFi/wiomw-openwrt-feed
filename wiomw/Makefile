@@ -8,12 +8,15 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wiomw
-PKG_VERSION:=1.0.4-rc1
-PKG_RELEASE:=4
+PKG_VERSION:=1.0.5
+PKG_RELEASE:=1
+PKG_MAINTAINER:=WIOMW Support <support@whoisonmywifi.com>
+PKG_LICENSE:=GPL-3.0+
+PKG_LICENSE_FILES:=COPYING
 
 PKG_SOURCE_PROTO:=git
-PKG_REV:=7fa05758c659764d2fdc04a184a7a54bbcb8a2b8
-PKG_SOURCE_URL:=ssh://git.io3o.com/csoutherland/wiomw-linux.git
+PKG_REV:=200f4cd6ec636a290b929c00b8815bfda1ed4c26
+PKG_SOURCE_URL:=git://github.com/whoisonmywifi/wiomw-linux.git
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_SUBDIR:=${PKG_NAME}-${PKG_VERSION}
 PKG_SOURCE_VERSION:=${PKG_REV}

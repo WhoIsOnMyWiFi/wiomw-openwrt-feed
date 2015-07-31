@@ -8,12 +8,15 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=wiomw-sui
-PKG_VERSION:=0.7.4
+PKG_VERSION:=0.7.7
 PKG_RELEASE:=1
+PKG_MAINTAINER:=WIOMW Support <support@whoisonmywifi.com>
+PKG_LICENSE:=GPL-3.0+
+PKG_LICENSE_FILES:=COPYING
 
 PKG_SOURCE_PROTO:=git
-PKG_REV:=9d3646a074632e844246d9296e53c342268211f5
-PKG_SOURCE_URL:=ssh://git.io3o.com/csoutherland/openwrt-sui.git
+PKG_REV:=3b1a02d17f9a76b65e00a8e750d6cc2530898d51
+PKG_SOURCE_URL:=git://github.com/whoisonmywifi/wiomw-sui.git
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_SUBDIR:=${PKG_NAME}-${PKG_VERSION}
 PKG_SOURCE_VERSION:=${PKG_REV}

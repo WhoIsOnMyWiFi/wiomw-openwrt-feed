@@ -8,8 +8,10 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-wiomw
-PKG_VERSION:=1.0.4-rc1
-PKG_RELEASE:=2
+PKG_VERSION:=1.0.5
+PKG_RELEASE:=1
+PKG_MAINTAINER:=WIOMW Support <support@whoisonmywifi.com>
+PKG_LICENSE:=GPL-3.0+
 LUCI_DIR:=/usr/lib/lua/luci
 
 include $(INCLUDE_DIR)/package.mk
@@ -35,10 +37,9 @@ define Build/Configure
 endef
 
 define Package/luci-app-wiomw/install
-	$(INSTALL_DIR) $(1)$(LUCI_DIR)/controller $(1)$(LUCI_DIR)/model/cbi/wiomw $(1)$(LUCI_DIR)/view/wiomw
+	$(INSTALL_DIR) $(1)$(LUCI_DIR)/controller $(1)$(LUCI_DIR)/model/cbi/wiomw
 	$(INSTALL_DATA) ./files/wiomw-controller.lua $(1)$(LUCI_DIR)/controller/wiomw.lua
 	$(INSTALL_DATA) ./files/wiomw-cbi.lua $(1)$(LUCI_DIR)/model/cbi/wiomw/basic.lua
-	$(INSTALL_DATA) ./files/wiomw-login.htm $(1)$(LUCI_DIR)/view/wiomw/login.htm
 endef
 
 $(eval $(call BuildPackage,luci-app-wiomw))
