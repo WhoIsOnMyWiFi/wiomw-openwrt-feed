@@ -1,0 +1,50 @@
+#!/bin/sh
+
+DUAL_RADIO=`uci -q get wireless.@wifi-device[1] > /dev/null 2> /dev/null && echo true`
+
+# security settings
+uci set dropbear.@dropbear[0].interface=lan
+uci commit dropbear
+uci set wireless.@wifi-iface[0].encryption=psk2+ccmp
+if [ "$DUAL_RADIO" == "true" ]
+then
+	uci set wireless.@wifi-iface[1].encryption=psk2+ccmp
+fi
+#uci commit wireless
+
+# usability settings
+uci set wireless.@wifi-device[0].channel=auto
+if [ "$DUAL_RADIO" == "true" ]
+then
+	uci set wireless.@wifi-device[1].channel=auto
+fi
+#uci commit wireless
+
+# sui-specific settings
+. /lib/ar71xx.sh
+touch /etc/config/sui
+uci set sui.changed=status
+uci set sui.system=properties
+if [ "$DUAL_RADIO" == "true" ]
+then
+	uci set sui.system.dualradio=1
+fi
+uci set sui.system.model="`ar71xx_board_name`"
+uci commit sui
+
+# Who Is On My WiFi specific settings to simplify setup instructions
+uci set system.@system[0].hostname=MyRouter
+uci commit system
+LAN_IP="`uci get network.lan.ipaddr`"
+uci set dhcp.easydomain=domain
+uci set dhcp.easydomain.name="setup.whoisonmywifi.net"
+uci set dhcp.easydomain.ip="$LAN_IP"
+uci commit dhcp
+
+
+grep "^/etc/\.FACTORY_DEFAULTS$" /etc/sysupgrade.conf || echo "/etc/.FACTORY_DEFAULTS" >> /etc/sysupgrade.conf
+
+sed -i "s/^\tjffs2reset -y \&\& reboot \&$/\tif \[ -r \"\/etc\/\.FACTORY_DEFAULTS\" \]\n\tthen\n\t\tcp \/etc\/\.FACTORY_DEFAULTS \/tmp\/FACTORY_DEFAULTS\.tar\.gz \&\& \\\\\n\t\tjffs2reset -y \&\& \\\\\n\t\tcp \/tmp\/FACTORY_DEFAULTS\.tar\.gz \/etc\/\.FACTORY_DEFAULTS \&\& \\\\\n\t\ttar xzf \/tmp\/FACTORY_DEFAULTS\.tar\.gz \&\& \\\\\n\t\tsync \&\& \\\\\n\t\treboot \&\n\telse\n\t\tjffs2reset -y \&\& reboot \&\n\tfi/" /etc/rc.button/reset
+ln -s /etc/rc.button/reset /etc/rc.button/wps
+
+exit 0
